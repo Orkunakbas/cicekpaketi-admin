@@ -30,6 +30,9 @@ if (!isDevelopment) {
   // Serve Next.js static files
   app.use('/_next', express.static(path.join(__dirname, 'admin/.next')));
   app.use('/static', express.static(path.join(__dirname, 'admin/.next/static')));
+  
+  // Serve public files (logo.png, favicon.ico vs.)
+  app.use(express.static(path.join(__dirname, 'admin/public')));
 
   // Serve admin panel (Next.js build)
   app.use(express.static(path.join(__dirname, 'admin/out')));
