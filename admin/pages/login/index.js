@@ -19,8 +19,7 @@ export default function Login() {
 
   // Component mount olduğunda localStorage'dan bilgileri yükle
   React.useEffect(() => {
-    console.log('🎣 Webhook Test - Component initialized!');
-    console.log('Component mount - localStorage kontrol ediliyor...');
+
     const savedEmail = localStorage.getItem('remembered_email');
     const savedPassword = localStorage.getItem('remembered_password');
     
@@ -103,7 +102,7 @@ export default function Login() {
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+Kcp/9k="
             />
           </div>
-          <p className="text-xl text-foreground font-bold tracking-[0.3em] uppercase font-sans">ORWYS WEBHOOK TEST</p>
+          <p className="text-xl text-foreground font-bold tracking-[0.3em] uppercase font-sans">ORWYS</p>
           <p className="text-small text-default-500">Devam etmek için hesabınıza giriş yapın</p>
         </div>
 
