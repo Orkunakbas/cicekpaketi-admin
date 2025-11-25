@@ -19,6 +19,7 @@ export default function Login() {
 
   // Component mount olduğunda localStorage'dan bilgileri yükle
   React.useEffect(() => {
+    console.log('🎣 Webhook Test - Component initialized!');
     console.log('Component mount - localStorage kontrol ediliyor...');
     const savedEmail = localStorage.getItem('remembered_email');
     const savedPassword = localStorage.getItem('remembered_password');
