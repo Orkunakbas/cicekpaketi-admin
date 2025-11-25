@@ -27,7 +27,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
-    
+      - NEXT_PUBLIC_API_URL=https://cicekpaketi.svision.ch
+    depends_on:
       - backend
     restart: always
     networks:

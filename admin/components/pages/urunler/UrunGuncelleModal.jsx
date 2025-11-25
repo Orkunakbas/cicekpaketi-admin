@@ -12,7 +12,7 @@ import {
   Tooltip,
 } from '@heroui/react';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
-import { updateProduct, fetchSingleProduct, deleteVariant } from '@/store/slices/productSlice';
+import { fetchSingleProduct, deleteVariant } from '@/store/slices/productSlice';
 import { fetchCategories } from '@/store/slices/categoriesSlice';
 import { fetchOptionTypes, fetchOptionValues } from '@/store/slices/variantSlice';
 import toast from 'react-hot-toast';
@@ -507,26 +507,88 @@ const UrunGuncelleModal = ({ isOpen, onClose, onSuccess, productId }) => {
     setIsSubmitting(true);
 
     try {
-      const data = {
-        ...formData,
-        category_id: JSON.stringify(formData.category_id),
-        language_code: router.locale || 'tr'
-      };
+      // FormData oluştur (resimler için)
+      const formDataToSend = new FormData();
+      
+      // Temel bilgileri ekle
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('short_description', formData.short_description || '');
+      formDataToSend.append('description', formData.description || '');
+      formDataToSend.append('category_id', JSON.stringify(formData.category_id));
+      formDataToSend.append('brand', formData.brand || '');
+      formDataToSend.append('tags', formData.tags || '');
+      formDataToSend.append('meta_title', formData.meta_title || '');
+      formDataToSend.append('meta_description', formData.meta_description || '');
+      formDataToSend.append('language_code', router.locale || 'tr');
+
+      // Varyantsız ürün için fiyat ve stok
+      if (!hasVariants) {
+        formDataToSend.append('price', formData.price || '');
+        formDataToSend.append('discount_price', formData.discount_price || '');
+        formDataToSend.append('stock_quantity', formData.stock_quantity || '');
+        formDataToSend.append('product_features', formData.product_features || '');
+        
+        // Yeni resimler varsa ekle (basit ürün)
+        if (formData.images && formData.images.length > 0) {
+          const newImages = formData.images.filter(img => img.isNew && img.file);
+          newImages.forEach((image) => {
+            formDataToSend.append('images', image.file);
+          });
+          console.log('📸 Basit ürün için yeni resim sayısı:', newImages.length);
+        }
+      }
 
       // Varyantlı ürünse varyantları ekle
       if (hasVariants) {
-        data.variants = variantCombinations;
+        // Varyant verilerini JSON olarak ekle
+        const variantsData = variantCombinations.map(combo => ({
+          id: combo.id,
+          price: combo.price,
+          discount_price: combo.discount_price,
+          stock_quantity: combo.stock_quantity,
+          product_features: combo.product_features,
+          items: combo.items,
+          label: combo.label
+        }));
+        formDataToSend.append('variants', JSON.stringify(variantsData));
+        
+        // Her varyant için yeni resimleri ekle
+        const imageVariantIds = [];
+        variantCombinations.forEach((combo) => {
+          if (combo.images && combo.images.length > 0) {
+            const newImages = combo.images.filter(img => img.isNew && img.file);
+            newImages.forEach((image) => {
+              formDataToSend.append('images', image.file);
+              imageVariantIds.push(combo.id); // Bu resim hangi varyanta ait
+            });
+          }
+        });
+        
+        if (imageVariantIds.length > 0) {
+          formDataToSend.append('imageVariantIds', JSON.stringify(imageVariantIds));
+          console.log('📸 Varyant resimleri:', imageVariantIds.length, 'resim');
+        }
         
         // Silinen varyantları ekle
         if (deletedVariantIds.length > 0) {
-          data.deletedVariantIds = deletedVariantIds;
+          formDataToSend.append('deletedVariantIds', JSON.stringify(deletedVariantIds));
           console.log('🗑️ Silinecek Varyantlar:', deletedVariantIds);
         }
       }
 
-      console.log('📤 Backend\'e Gönderilen Data:', data);
+      console.log('📤 Backend\'e Gönderiliyor...');
 
-      await dispatch(updateProduct({ id: productId, data })).unwrap();
+      const response = await fetch(`/api/products/update/${productId}`, {
+        method: 'PUT',
+        body: formDataToSend,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Ürün güncellenemedi');
+      }
+
       toast.success('Ürün başarıyla güncellendi');
       
       if (onSuccess) onSuccess();

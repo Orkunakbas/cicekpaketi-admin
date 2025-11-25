@@ -48,12 +48,38 @@ export const addProduct = createAsyncThunk(
   'products/addProduct',
   async (productData, { rejectWithValue }) => {
     try {
+      // FormData oluştur (resimler için)
+      const formData = new FormData();
+      
+      // Temel ürün bilgilerini ekle
+      Object.keys(productData).forEach(key => {
+        if (key === 'variants') {
+          // Varyantları JSON string olarak ekle
+          formData.append('variants', JSON.stringify(productData.variants));
+        } else if (key === 'imageFiles') {
+          // Yeni resim dosyalarını ekle
+          productData.imageFiles.forEach((file) => {
+            formData.append('images', file);
+          });
+        } else if (key === 'imageVariantIds') {
+          // Resim-varyant eşleştirmesini ekle
+          formData.append('imageVariantIds', JSON.stringify(productData.imageVariantIds));
+        } else if (key === 'variantCombinations') {
+          // Varyant kombinasyonlarını JSON string olarak ekle
+          formData.append('variantCombinations', JSON.stringify(productData.variantCombinations));
+        } else if (key === 'variantImageMapping') {
+          // Varyant resim eşleştirmesini JSON string olarak ekle
+          formData.append('variantImageMapping', JSON.stringify(productData.variantImageMapping));
+        } else if (key === 'images') {
+          // images key'ini atlıyoruz (sadece metadata, gerçek dosyalar imageFiles'ta)
+        } else {
+          formData.append(key, productData[key]);
+        }
+      });
+      
       const response = await fetch(getApiUrl('/api/products/add'), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(productData),
+        body: formData, // FormData gönder (Content-Type otomatik ayarlanır)
       });
       
       const data = await response.json();

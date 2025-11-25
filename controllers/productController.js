@@ -866,7 +866,7 @@ exports.updateProduct = async (req, res) => {
 
     // Slug güncelle (sadece isim değiştiyse)
     let slug = product.slug;
-    if (product.name !== name) {
+    if (name && product.name !== name) {
       slug = await createProductUrl(name, id);
     }
 

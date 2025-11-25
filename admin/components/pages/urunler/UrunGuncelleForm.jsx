@@ -171,7 +171,7 @@ const UrunGuncelleForm = ({
                               size="sm"
                               color="danger"
                               variant="flat"
-                              onPress={() => handleImageDeleteClick(image)}
+                              onPress={() => handleSimpleImageDelete(image.id)}
                             >
                               <FaTrash />
                             </Button>

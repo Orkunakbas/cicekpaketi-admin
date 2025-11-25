@@ -157,15 +157,28 @@ export default function App({ Component, pageProps }) {
               style: {
                 background: '#1e1e2d',
                 color: '#fff',
-                border: '1px solid rgba(255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '12px',
+                padding: '16px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
               },
               success: {
+                style: {
+                  background: '#1e1e2d',
+                  color: '#fff',
+                  border: '1px solid #10b981',
+                },
                 iconTheme: {
                   primary: '#10b981',
                   secondary: '#fff',
                 },
               },
               error: {
+                style: {
+                  background: '#1e1e2d',
+                  color: '#fff',
+                  border: '1px solid #ef4444',
+                },
                 iconTheme: {
                   primary: '#ef4444',
                   secondary: '#fff',
