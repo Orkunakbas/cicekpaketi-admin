@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const sequelize = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,23 +17,31 @@ const limiter = rateLimit({
 // Middleware
 app.use(limiter);
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' })); // Resimler için limit artırıldı
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Trust proxy for rate limiter
 app.set('trust proxy', 1);
 
+// Uploads klasörünü static olarak serve et
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // API Routes
-app.use('/api/auth', require('./routes/auth'));
+app.use('/api/admin', require('./routes/adminRoute'));
+app.use('/api/languages', require('./routes/languageRoute'));
+app.use('/api/categories', require('./routes/categoryRoute'));
+app.use('/api/users', require('./routes/userRoute'));
+app.use('/api/variant-options', require('./routes/variantOptionRoute'));
+app.use('/api/products', require('./routes/productRoute'));
+app.use('/api/addresses', require('./routes/addressRoute'));
+app.use('/api/cart', require('./routes/cartRoute'));
+
 
 // Production modunda Next.js build'ini serve et
 if (!isDevelopment) {
   // Serve Next.js static files
   app.use('/_next', express.static(path.join(__dirname, 'admin/.next')));
   app.use('/static', express.static(path.join(__dirname, 'admin/.next/static')));
-  
-  // Serve public files (logo.png, favicon.ico vs.)
-  app.use(express.static(path.join(__dirname, 'admin/public')));
 
   // Serve admin panel (Next.js build)
   app.use(express.static(path.join(__dirname, 'admin/out')));
@@ -59,6 +68,15 @@ app.use((err, req, res, next) => {
 app.use('/api/*', (req, res) => {
   res.status(404).json({ error: 'API route not found' });
 });
+
+// Database bağlantısını test et
+sequelize.authenticate()
+  .then(() => {
+    console.log('✅ Veritabanına başarıyla bağlandı.');
+  })
+  .catch(err => {
+    console.error('❌ Veritabanı bağlantı hatası:', err);
+  });
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

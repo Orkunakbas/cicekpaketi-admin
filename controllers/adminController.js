@@ -8,19 +8,19 @@ const JWT_SECRET = 'orwys-cms-secret-key-2024';
 exports.login = async (req, res) => {
   try {
     // Hem JSON hem form data destekle
-    const { username, password } = req.body;
+    const { username, password } = req.body; // Frontend'den hala username geliyor
 
     // Validation
     if (!username || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Username ve password gerekli!'
+        message: 'E-posta ve şifre gereklidir.'
       });
     }
 
-    // Database'den user bulma
+    // Database'den user bulma (email alanında ara)
     const user = await Admin.findOne({ 
-      where: { username: username } 
+      where: { email: username } // username aslında email
     });
     
     if (!user) {
@@ -42,7 +42,8 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { 
         id: user.id, 
-        username: user.username,
+        email: user.email,
+        fullname: user.fullname,
         authority: user.authority 
       },
       JWT_SECRET,
@@ -54,10 +55,11 @@ exports.login = async (req, res) => {
     // Başarılı login
     res.json({
       success: true,
-      message: 'Login başarılı!',
+      message: 'Giriş başarılı!',
       user: {
         id: user.id,
-        username: user.username,
+        email: user.email,
+        fullname: user.fullname,
         authority: user.authority
       },
       token: token

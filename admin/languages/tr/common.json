@@ -1,0 +1,35 @@
+{
+  "sidebar": {
+    "dashboard": "Panel",
+    "users": "Kullanıcılar",
+    "products": "Ürünler",
+    "orders": "Siparişler",
+    "settings": "Ayarlar",
+    "logout": "Çıkış Yap"
+  },
+  "topbar": {
+    "welcome": "Hoşgeldin",
+    "search": "Ara...",
+    "notifications": "Bildirimler",
+    "profile": "Profil",
+    "settings": "Ayarlar",
+    "logout": "Çıkış Yap"
+  },
+  "common": {
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "add": "Ekle",
+    "search": "Ara",
+    "filter": "Filtrele",
+    "export": "Dışa Aktar",
+    "import": "İçe Aktar",
+    "loading": "Yükleniyor...",
+    "noData": "Veri bulunamadı",
+    "error": "Bir hata oluştu",
+    "success": "Başarılı"
+  }
+}
+
+

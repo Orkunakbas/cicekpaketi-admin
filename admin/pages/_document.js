@@ -2,11 +2,8 @@ import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
   return (
-    <Html lang="tr">
+    <Html lang="tr" className="dark">
       <Head>
-        {/* Sayfa başlığı */}
-        <title>Orwys | Yönetim Paneli</title>
-        
         {/* Google indexlenmesini engelle */}
         <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
         <meta name="googlebot" content="noindex, nofollow" />
@@ -19,7 +16,7 @@ export default function Document() {
         {/* Favicon */}
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <body >
+      <body className="dark">
         <Main />
         <NextScript />
       </body>

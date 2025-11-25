@@ -1,28 +1,148 @@
 @import "tailwindcss";
 @config "../hero.ts";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Dark Mode Colors */
+:root.dark {
+  --background: #1e1e2d;
+  --foreground: #ffffff;
+
 }
 
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Roobert Font Family */
+@font-face {
+  font-family: 'Roobert';
+  src: url('/fonts/RoobertTRIAL-Light-BF67243fd502239.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@font-face {
+  font-family: 'Roobert';
+  src: url('/fonts/RoobertTRIAL-Regular-BF67243fd53fdf2.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roobert';
+  src: url('/fonts/RoobertTRIAL-Medium-BF67243fd53e059.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roobert';
+  src: url('/fonts/RoobertTRIAL-SemiBold-BF67243fd54213d.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roobert';
+  src: url('/fonts/RoobertTRIAL-Bold-BF67243fd540abb.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roobert';
+  src: url('/fonts/RoobertTRIAL-Heavy-BF67243fd53e164.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Roobert', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  transition: all 0.2s ease-in-out;
 }
+
+body.dark,
+.dark body {
+  background-color: #1e1e2d;
+  color: #ffffff;
+}
+
+.bg-dark {
+  background-color: #1e1e2d;
+}
+
+.bg-card {
+  background-color: #1e2030;
+}
+
+
+
+
+
+
+
+/* Smooth transitions */
+
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sidebar gradient animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+
+
+/* Dropdown Menu Background */
+[data-slot="base"] {
+  background-color: transparent !important;
+}
+
+/* Table Styles */
+.table-wrapper {
+  background-color: #242435;
+ 
+}
+
+.table-th {
+  background-color: #33344f;
+ 
+}
+
+
+
+
+
+
+
+
+

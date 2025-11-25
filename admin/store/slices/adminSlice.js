@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import getApiUrl from '../../utils/api';
 
 // SessionStorage'dan token kontrol et (sadece client-side)
 const getStoredAuth = () => {
@@ -30,10 +31,10 @@ const getStoredAuth = () => {
 
 // Async thunk for login
 export const loginUser = createAsyncThunk(
-  'auth/loginUser',
+  'admin/loginUser',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(getApiUrl('/api/admin/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +57,7 @@ export const loginUser = createAsyncThunk(
 
 // Async thunk for restoring session
 export const restoreSession = createAsyncThunk(
-  'auth/restoreSession',
+  'admin/restoreSession',
   async (_, { rejectWithValue }) => {
     const storedAuth = getStoredAuth();
     if (storedAuth.isAuthenticated) {
@@ -66,19 +67,27 @@ export const restoreSession = createAsyncThunk(
   }
 );
 
-const authSlice = createSlice({
-  name: 'auth',
+const adminSlice = createSlice({
+  name: 'admin',
   initialState: {
     user: null,
     token: null,
     isLoading: false,
     error: null,
+    successMessage: null,
     isAuthenticated: false,
     isInitialized: false, // Hydration için
+    sidebarCollapsed: false, // Sidebar durumu
   },
   reducers: {
     clearError: (state) => {
       state.error = null;
+    },
+    clearSuccess: (state) => {
+      state.successMessage = null;
+    },
+    toggleSidebar: (state) => {
+      state.sidebarCollapsed = !state.sidebarCollapsed;
     },
     setCredentials: (state, action) => {
       state.user = action.payload.user;
@@ -119,6 +128,7 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.isAuthenticated = true;
         state.error = null;
+        state.successMessage = action.payload.message;
         
         // sessionStorage'a kaydet
         if (typeof window !== 'undefined') {
@@ -144,5 +154,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, setCredentials, clearCredentials, setInitialized } = authSlice.actions;
-export default authSlice.reducer; 
+export const { clearError, setCredentials, clearCredentials, setInitialized, clearSuccess, toggleSidebar } = adminSlice.actions;
+export default adminSlice.reducer; 
