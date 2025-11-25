@@ -10,15 +10,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - DB_HOST=host.docker.internal  # Plesk MySQL'e bağlanır
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - JWT_SECRET=${JWT_SECRET}
     volumes:
       - ./uploads:/app/uploads  # Upload'lar korunur
-    extra_hosts:
-      - "host.docker.internal:host-gateway"  # Linux için MySQL bağlantısı
     restart: always
     networks:
       - panel-network
@@ -34,8 +27,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
-      - NEXT_PUBLIC_API_URL=https://yourdomain.com  # Aynı domain, sadece /api prefix
-    depends_on:
+    
       - backend
     restart: always
     networks:
