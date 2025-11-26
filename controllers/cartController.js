@@ -81,18 +81,18 @@ exports.getCart = async (req, res) => {
 
     // Fiyat hesaplaması
     let subtotal = 0;
-    let discount = 0;
 
     const items = cartItems.map(item => {
       const itemPrice = parseFloat(item.price);
       const itemDiscountPrice = item.discount_price ? parseFloat(item.discount_price) : null;
+      const finalPrice = itemDiscountPrice || itemPrice; // İndirimli fiyat varsa onu, yoksa normal fiyatı kullan
       const quantity = item.quantity;
 
-      const lineTotal = (itemDiscountPrice || itemPrice) * quantity;
+      const lineTotal = finalPrice * quantity;
       const lineDiscount = itemDiscountPrice ? (itemPrice - itemDiscountPrice) * quantity : 0;
 
-      subtotal += itemPrice * quantity;
-      discount += lineDiscount;
+      // Subtotal'a son fiyatı ekle (indirimli veya normal)
+      subtotal += lineTotal;
 
       // Ürün bilgileri
       const product = item.product;
@@ -138,7 +138,7 @@ exports.getCart = async (req, res) => {
           id: product?.id,
           slug: product?.slug,
           name: product?.name || 'Ürün',
-          image: coverImage?.image_url ? `${req.protocol}://${req.get('host')}${coverImage.image_url}` : null,
+          image: coverImage?.image_url ? `${req.protocol}://${req.get('host')}/${coverImage.image_url}` : null,
           is_variant: product?.is_variant
         },
         
@@ -152,9 +152,14 @@ exports.getCart = async (req, res) => {
       };
     });
 
-    const total = subtotal - discount;
+    // Kargo hesaplama
+    const SHIPPING_COST = 50; // Sabit kargo ücreti (TL)
+    const FREE_SHIPPING_THRESHOLD = 1000; // Ücretsiz kargo için minimum tutar (TL)
+    
+    const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+    const total = subtotal + shippingCost;
 
-    res.json({
+    const cartResponse = {
       success: true,
       data: {
         cart: {
@@ -166,13 +171,19 @@ exports.getCart = async (req, res) => {
         },
         items,
         summary: {
-          subtotal: subtotal.toFixed(2),
-          discount: discount.toFixed(2),
+          subtotal: subtotal.toFixed(2), // İndirimli fiyatlarla hesaplanmış subtotal
+          discount: 0, // Artık ayrı discount tutmuyoruz
+          shipping_cost: shippingCost.toFixed(2),
+          free_shipping_threshold: FREE_SHIPPING_THRESHOLD,
           total: total.toFixed(2),
           item_count: items.length
         }
       }
-    });
+    };
+
+    console.log('🛒 Backend - Sepet Response:', JSON.stringify(cartResponse, null, 2));
+
+    res.json(cartResponse);
 
   } catch (error) {
     console.error('Sepet getirme hatası:', error);
@@ -188,6 +199,14 @@ exports.getCart = async (req, res) => {
 exports.addToCart = async (req, res) => {
   try {
     const { user_id, session_id, product_id, variant_id, quantity = 1 } = req.body;
+
+    console.log('🛒 Sepete Ekleme İsteği:');
+    console.log('📦 Body:', req.body);
+    console.log('👤 User ID:', user_id);
+    console.log('🔑 Session ID:', session_id);
+    console.log('🎁 Product ID:', product_id);
+    console.log('🎨 Variant ID:', variant_id);
+    console.log('🔢 Quantity:', quantity);
 
     if (!user_id && !session_id) {
       return res.status(400).json({ 
@@ -272,7 +291,7 @@ exports.addToCart = async (req, res) => {
       });
     }
 
-    res.json({
+    const response = {
       success: true,
       message: 'Ürün sepete eklendi',
       data: {
@@ -280,7 +299,11 @@ exports.addToCart = async (req, res) => {
         session_id: cart.session_id,
         item: cartItem
       }
-    });
+    };
+
+    console.log('✅ Backend - Dönen Response:', JSON.stringify(response, null, 2));
+
+    res.json(response);
 
   } catch (error) {
     console.error('Sepete ekleme hatası:', error);

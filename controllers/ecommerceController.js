@@ -631,8 +631,8 @@ exports.searchProducts = async (req, res) => {
           slug: product.slug,
           short_description: product.short_description,
           coverImage,
-          minPrice: minPrice || 0,
-          maxPrice: maxPrice || minPrice || 0,
+          minPrice: minDiscount || minPrice || 0,
+          maxPrice: maxDiscount || maxPrice || minPrice || 0,
           minDiscount,
           maxDiscount,
           is_variant: product.is_variant

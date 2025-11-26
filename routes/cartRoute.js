@@ -9,10 +9,10 @@ router.get('/', cartController.getCart);
 router.post('/add', cartController.addToCart);
 
 // Sepet ürününü güncelle (adet değiştir)
-router.put('/item/:id', cartController.updateCartItem);
+router.put('/update/:id', cartController.updateCartItem);
 
 // Sepetten ürün sil
-router.delete('/item/:id', cartController.removeFromCart);
+router.delete('/remove/:id', cartController.removeFromCart);
 
 // Sepeti temizle
 router.delete('/clear', cartController.clearCart);

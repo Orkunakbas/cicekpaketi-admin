@@ -35,6 +35,7 @@ app.use('/api/variant-options', require('./routes/variantOptionRoute'));
 app.use('/api/products', require('./routes/productRoute'));
 app.use('/api/addresses', require('./routes/addressRoute'));
 app.use('/api/cart', require('./routes/cartRoute'));
+app.use('/api/orders', require('./routes/orderRoute'));
 
 
 // Production modunda Next.js build'ini serve et
