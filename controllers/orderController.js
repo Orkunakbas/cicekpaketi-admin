@@ -15,6 +15,8 @@ const generateOrderNumber = () => {
 // Sipariş oluştur
 exports.createOrder = async (req, res) => {
   try {
+    console.log('🚀 ========== SİPARİŞ OLUŞTURMA BAŞLADI ==========');
+    
     const {
       user_id,
       session_id,
@@ -167,15 +169,34 @@ exports.createOrder = async (req, res) => {
 
     console.log('✅ Sipariş Oluşturuldu:', order.id, orderNumber);
 
-    // 7. Sipariş ürünlerini oluştur
+    // 7. Sipariş ürünlerini oluştur ve stok düşür
+    console.log('📦 Sipariş ürünleri oluşturuluyor:', orderItemsData.length, 'adet');
+    
     for (const itemData of orderItemsData) {
       await OrderItem.create({
         order_id: order.id,
         ...itemData
       });
+
+      console.log(`🔍 Stok kontrolü - Ürün: ${itemData.product_name}, Variant ID: ${itemData.variant_id}, Miktar: ${itemData.quantity}`);
+
+      // Stok düşürme: Eğer varyant varsa stok miktarını azalt
+      if (itemData.variant_id) {
+        const variant = await ProductVariant.findByPk(itemData.variant_id);
+        if (variant) {
+          const oldStock = variant.stock_quantity;
+          const newStock = Math.max(0, oldStock - itemData.quantity);
+          await variant.update({ stock_quantity: newStock });
+          console.log(`📉 Stok Düşürüldü - Variant ID: ${itemData.variant_id}, Eski: ${oldStock}, Yeni: ${newStock}`);
+        } else {
+          console.log(`⚠️ Varyant bulunamadı - Variant ID: ${itemData.variant_id}`);
+        }
+      } else {
+        console.log(`⚠️ Bu ürünün varyant ID'si yok (basit ürün veya varyant seçilmemiş)`);
+      }
     }
 
-    console.log('✅ Sipariş Ürünleri Eklendi:', orderItemsData.length);
+    console.log('✅ Sipariş Ürünleri Eklendi ve Stoklar Güncellendi:', orderItemsData.length);
 
     // 8. Sepeti temizle
     await CartItem.destroy({
