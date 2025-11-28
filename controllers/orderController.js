@@ -255,6 +255,74 @@ exports.createOrder = async (req, res) => {
   }
 };
 
+// Admin - Tüm siparişleri getir
+exports.getAllOrders = async (req, res) => {
+  try {
+    const { status, search, page = 1, limit = 20 } = req.query;
+    
+    const where = {};
+    
+    // Status filtresi
+    if (status && status !== 'all') {
+      where.order_status = status;
+    }
+    
+    // Arama (sipariş numarası, müşteri adı, email)
+    if (search) {
+      const { Op } = require('sequelize');
+      where[Op.or] = [
+        { order_number: { [Op.like]: `%${search}%` } },
+        { customer_name: { [Op.like]: `%${search}%` } },
+        { customer_email: { [Op.like]: `%${search}%` } }
+      ];
+    }
+
+    const offset = (page - 1) * limit;
+
+    // Tüm siparişleri getir
+    const { count, rows: orders } = await Order.findAndCountAll({
+      where,
+      order: [['created_at', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
+    });
+
+    // Her sipariş için ürünleri getir
+    const ordersWithItems = await Promise.all(
+      orders.map(async (order) => {
+        const orderItems = await OrderItem.findAll({
+          where: { order_id: order.id }
+        });
+
+        return {
+          ...order.toJSON(),
+          orderItems,
+          item_count: orderItems.length
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      data: ordersWithItems,
+      pagination: {
+        total: count,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(count / limit)
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Tüm siparişleri getirme hatası:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Siparişler getirilirken hata oluştu',
+      error: error.message
+    });
+  }
+};
+
 // Kullanıcının siparişlerini getir
 exports.getUserOrders = async (req, res) => {
   try {
@@ -339,6 +407,63 @@ exports.getOrderByNumber = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Sipariş detayı getirilirken hata oluştu',
+      error: error.message
+    });
+  }
+};
+
+// Admin - Sipariş güncelle (durum, kargo bilgisi vb.)
+exports.updateOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      order_status,
+      payment_status,
+      tracking_number,
+      shipping_company,
+      admin_note
+    } = req.body;
+
+    const order = await Order.findByPk(id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Sipariş bulunamadı'
+      });
+    }
+
+    // Güncellenecek alanlar
+    const updateData = {};
+    if (order_status) updateData.order_status = order_status;
+    if (payment_status) updateData.payment_status = payment_status;
+    if (tracking_number !== undefined) updateData.tracking_number = tracking_number;
+    if (shipping_company !== undefined) updateData.shipping_company = shipping_company;
+    if (admin_note !== undefined) updateData.admin_note = admin_note;
+
+    await order.update(updateData);
+
+    // Güncellenmiş siparişi ürünleriyle birlikte getir
+    const orderItems = await OrderItem.findAll({
+      where: { order_id: order.id }
+    });
+
+    const orderResponse = {
+      ...order.toJSON(),
+      orderItems
+    };
+
+    res.json({
+      success: true,
+      message: 'Sipariş başarıyla güncellendi',
+      data: orderResponse
+    });
+
+  } catch (error) {
+    console.error('❌ Sipariş güncelleme hatası:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Sipariş güncellenirken hata oluştu',
       error: error.message
     });
   }

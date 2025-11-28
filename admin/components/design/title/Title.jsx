@@ -1,9 +1,10 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
+import { Button } from '@heroui/react';
 import { IoArrowBack } from 'react-icons/io5';
 
-const Title = ({ children, showBackButton = true }) => {
+const Title = ({ children, showBackButton = false }) => {
   const router = useRouter();
 
   const handleBack = () => {
@@ -18,12 +19,14 @@ const Title = ({ children, showBackButton = true }) => {
       transition={{ duration: 0.3 }}
     >
       {showBackButton && (
-        <button
-          onClick={handleBack}
-          className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-700 hover:border-gray-600 hover:bg-white/5 transition-all"
+        <Button
+          isIconOnly
+          variant="bordered"
+          onPress={handleBack}
+          className="border-gray-700 hover:border-gray-600"
         >
           <IoArrowBack className="text-white text-xl" />
-        </button>
+        </Button>
       )}
       
       <h2 className="text-2xl medium text-white tracking-wide">

@@ -25,7 +25,7 @@ import { HiOutlinePencilSquare } from "react-icons/hi2";
 
 
 
-import { FaHome, FaUsers, FaFileAlt, FaCog, FaSignOutAlt, FaChevronLeft, FaChevronRight, FaChevronDown, FaUserPlus, FaUserEdit, FaUserShield, FaPlus, FaEdit, FaTrash, FaInfoCircle, FaFile, FaBox, FaNewspaper, FaBlog, FaHandshake, FaVideo, FaQuestionCircle, FaWpforms, FaLanguage, FaCubes, FaMinus } from 'react-icons/fa';
+import { FaHome, FaUsers, FaFileAlt, FaCog, FaSignOutAlt, FaChevronLeft, FaChevronRight, FaChevronDown, FaUserPlus, FaUserEdit, FaUserShield, FaPlus, FaEdit, FaTrash, FaInfoCircle, FaFile, FaBox, FaNewspaper, FaBlog, FaHandshake, FaVideo, FaQuestionCircle, FaWpforms, FaLanguage, FaCubes, FaMinus, FaClipboardList } from 'react-icons/fa';
 import { FaRegImages } from 'react-icons/fa6';
 import { AiOutlineRight } from 'react-icons/ai';
 import { Avatar } from '@heroui/react';
@@ -85,6 +85,12 @@ const Sidebar = () => {
       label: 'Ürünler', 
       path: '/urunler',
       key: 'urunler'
+    },
+    { 
+      icon: FaClipboardList, 
+      label: 'Siparişler', 
+      path: '/siparisler',
+      key: 'siparisler'
     },
     { 
       icon: FaUsers, 
