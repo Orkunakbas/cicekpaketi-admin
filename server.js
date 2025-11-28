@@ -30,6 +30,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/admin', require('./routes/adminRoute'));
 app.use('/api/languages', require('./routes/languageRoute'));
 app.use('/api/categories', require('./routes/categoryRoute'));
+app.use('/api/banners', require('./routes/bannerRoute'));
 app.use('/api/users', require('./routes/userRoute'));
 app.use('/api/variant-options', require('./routes/variantOptionRoute'));
 app.use('/api/products', require('./routes/productRoute'));

@@ -63,6 +63,12 @@ const Sidebar = () => {
       key: 'dashboard'
     },
     { 
+      icon: FaRegImages, 
+      label: 'Banner\'lar', 
+      path: '/bannerlar',
+      key: 'bannerlar'
+    },
+    { 
       icon: BiCategory, 
       label: 'Kategoriler', 
       path: '/kategoriler',
