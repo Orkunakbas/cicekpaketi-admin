@@ -656,3 +656,223 @@ exports.searchProducts = async (req, res) => {
   }
 };
 
+// ============================================
+// E-TİCARET - ÖNE ÇIKAN ÜRÜNLER
+// ============================================
+exports.getFeaturedProducts = async (req, res) => {
+  try {
+    const { language_code } = req.query;
+    
+    // WHERE şartları: is_featured = 1 ve is_active = 1
+    const whereClause = {
+      is_featured: true,
+      is_active: true
+    };
+    
+    if (language_code) {
+      whereClause.language_code = language_code;
+    }
+    
+    console.log('⭐ [E-Commerce] Öne çıkan ürünler getiriliyor:', whereClause);
+    
+    const products = await Product.findAll({
+      where: whereClause,
+      order: [['id', 'DESC']],
+      raw: true
+    });
+
+    console.log('✅ [E-Commerce] Öne çıkan ürün sayısı:', products.length);
+
+    // Her ürün için varyant sayısını, resim sayısını ve fiyat/stok bilgisini ekle
+    const productsWithDetails = await Promise.all(
+      products.map(async (product) => {
+        const variantCount = await ProductVariant.count({
+          where: { product_id: product.id }
+        });
+        
+        // TÜM resimleri al (basit ürün resimleri)
+        let images = await Image.findAll({
+          where: { 
+            imageable_id: product.id,
+            imageable_type: 'products'
+          },
+          order: [['sort_order', 'ASC']],
+          raw: true
+        });
+
+        // Eğer varyantlı ürünse, tüm varyantların resimlerini de ekle
+        if (variantCount > 0) {
+          const variants = await ProductVariant.findAll({
+            where: { product_id: product.id },
+            raw: true
+          });
+          
+          for (const variant of variants) {
+            const variantImages = await Image.findAll({
+              where: { 
+                imageable_id: variant.id,
+                imageable_type: 'products'
+              },
+              order: [['sort_order', 'ASC']],
+              raw: true
+            });
+            images = images.concat(variantImages);
+          }
+        }
+
+        // Kapak resmini bul
+        const coverImage = images.find(img => img.image_type === 'cover') || images[0];
+        
+        const imageCount = images.length;
+
+        // TÜM VARYANTLARI ÇEK (fiyat bilgisi için)
+        const allVariants = await ProductVariant.findAll({
+          where: { product_id: product.id },
+          raw: true
+        });
+
+        // Her varyant için resimleri de çek
+        const variantsWithImages = await Promise.all(
+          allVariants.map(async (variant) => {
+            let variantImages = [];
+            
+            // Eğer basit ürünse (is_variant: 0), product_id'ye bağlı resimleri al
+            if (product.is_variant === 0) {
+              variantImages = await Image.findAll({
+                where: { 
+                  imageable_id: product.id,
+                  imageable_type: 'products'
+                },
+                order: [['sort_order', 'ASC']],
+                raw: true
+              });
+            } else {
+              // Varyantlı ürünlerde variant_id'ye bağlı resimleri al
+              variantImages = await Image.findAll({
+                where: { 
+                  imageable_id: variant.id,
+                  imageable_type: 'products'
+                },
+                order: [['sort_order', 'ASC']],
+                raw: true
+              });
+            }
+
+            // Resimlerden gereksiz alanları kaldır
+            const cleanImages = variantImages.map(img => ({
+              id: img.id,
+              image_url: img.image_url,
+              image_type: img.image_type,
+              sort_order: img.sort_order,
+              alt_text: img.alt_text
+            }));
+
+            return {
+              id: variant.id,
+              sku: variant.sku,
+              color: variant.color,
+              size: variant.size,
+              material: variant.material,
+              price: parseFloat(variant.price),
+              discount_price: variant.discount_price ? parseFloat(variant.discount_price) : null,
+              stock_quantity: parseInt(variant.stock_quantity) || 0,
+              product_features: variant.product_features || '',
+              images: cleanImages
+            };
+          })
+        );
+
+        // Min ve Max fiyat hesapla
+        let minPrice = null;
+        let maxPrice = null;
+        let minDiscountPrice = null;
+        let maxDiscountPrice = null;
+
+        if (variantsWithImages && variantsWithImages.length > 0) {
+          const prices = variantsWithImages.map(v => v.price).filter(p => p > 0);
+          const discountPrices = variantsWithImages
+            .map(v => v.discount_price)
+            .filter(p => p !== null && p > 0);
+          
+          if (prices.length > 0) {
+            minPrice = Math.min(...prices);
+            maxPrice = Math.max(...prices);
+          }
+          
+          if (discountPrices.length > 0) {
+            minDiscountPrice = Math.min(...discountPrices);
+            maxDiscountPrice = Math.max(...discountPrices);
+          }
+        }
+
+        // Kategori isimlerini al
+        let parsedCategoryIds = [];
+        let categoryNames = [];
+        
+        if (product.category_id) {
+          try {
+            let categoryIds = product.category_id;
+            
+            if (typeof categoryIds === 'string') {
+              categoryIds = JSON.parse(categoryIds);
+            }
+            
+            if (typeof categoryIds === 'string') {
+              categoryIds = JSON.parse(categoryIds);
+            }
+            
+            parsedCategoryIds = Array.isArray(categoryIds) ? categoryIds : [];
+            
+            if (parsedCategoryIds.length > 0) {
+              const cats = await Category.findAll({
+                where: { id: parsedCategoryIds },
+                attributes: ['id', 'name'],
+                raw: true
+              });
+              categoryNames = cats.map(c => c.name);
+            }
+          } catch (e) {
+            console.error('❌ [E-Commerce] Kategori parse hatası:', e.message);
+            parsedCategoryIds = [];
+          }
+        }
+
+        return { 
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          description: product.description,
+          short_description: product.short_description,
+          category_id: parsedCategoryIds,
+          categoryNames: categoryNames,
+          brand: product.brand,
+          tags: product.tags,
+          is_variant: product.is_variant,
+          language_code: product.language_code,
+          variantCount,
+          imageCount,
+          coverImage: coverImage?.image_url || null,
+          minPrice,
+          maxPrice,
+          minDiscountPrice,
+          maxDiscountPrice,
+          variants: variantsWithImages
+        };
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      count: productsWithDetails.length,
+      data: productsWithDetails
+    });
+  } catch (error) {
+    console.error('❌ [E-Commerce] Öne çıkan ürünler getirilirken hata:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Öne çıkan ürünler getirilirken bir hata oluştu',
+      error: error.message
+    });
+  }
+};
+

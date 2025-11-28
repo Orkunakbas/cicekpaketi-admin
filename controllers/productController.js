@@ -903,19 +903,6 @@ exports.updateProduct = async (req, res) => {
       meta_description
     }, { transaction: t });
 
-    // Yeni resimler varsa ekle
-    if (req.files && req.files.length > 0) {
-      const imageRecords = req.files.map((file, index) => ({
-        image_url: file.path,
-        imageable_id: product.id,
-        image_type: req.body.image_type?.[index] || 'gallery',
-        imageable_type: 'products',
-        sort_order: index
-      }));
-      
-      await Image.bulkCreate(imageRecords, { transaction: t });
-    }
-
     // Yeni resimler varsa ekle (req.files)
     if (req.files && req.files.length > 0) {
       console.log('📤 Yeni resimler ekleniyor:', req.files.length, 'dosya');
@@ -923,17 +910,45 @@ exports.updateProduct = async (req, res) => {
       // Her dosya için variant_id kontrolü yap (req.body'den gelecek)
       const imageVariantIds = req.body.imageVariantIds ? JSON.parse(req.body.imageVariantIds) : [];
       
+      // Hangi varyantlar için kapak resmi var kontrol et
+      const variantsWithCover = new Set();
+      
       for (let i = 0; i < req.files.length; i++) {
         const file = req.files[i];
         const variantId = imageVariantIds[i] || null;
+        const targetId = variantId || product.id;
+        
+        // Bu varyant/product için zaten kapak var mı kontrol et (sadece bir kere)
+        if (!variantsWithCover.has(targetId)) {
+          const existingCover = await Image.findOne({
+            where: {
+              imageable_id: targetId,
+              imageable_type: 'products',
+              image_type: 'cover'
+            },
+            transaction: t
+          });
+          
+          if (existingCover) {
+            variantsWithCover.add(targetId);
+          }
+        }
+        
+        // Eğer bu varyant/product için kapak yoksa ve bu ilk resimse, cover yap
+        const shouldBeCover = !variantsWithCover.has(targetId);
         
         await Image.create({
           image_url: file.path.replace(/\\/g, '/'),
-          imageable_id: variantId || product.id,
+          imageable_id: targetId,
           imageable_type: 'products',
-          image_type: i === 0 ? 'cover' : 'gallery',
+          image_type: shouldBeCover ? 'cover' : 'gallery',
           sort_order: i
         }, { transaction: t });
+        
+        // Cover olarak eklediyse, artık bu varyant için cover var
+        if (shouldBeCover) {
+          variantsWithCover.add(targetId);
+        }
       }
       
       console.log('✅ Resimler kaydedildi');

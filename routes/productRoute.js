@@ -51,6 +51,9 @@ router.get('/categories/:language_code?', ecommerceController.getCategories);
 // Ürün arama (query parametresi ile)
 router.get('/search', ecommerceController.searchProducts);
 
+// Öne çıkan ürünler (is_featured = 1)
+router.get('/featured', ecommerceController.getFeaturedProducts);
+
 // Tek ürün detayı (slug bazlı - E-Commerce için)
 router.get('/detail/:slug', ecommerceController.getSingleProduct);
 

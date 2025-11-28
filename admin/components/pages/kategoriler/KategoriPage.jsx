@@ -85,10 +85,16 @@ const KategoriPage = () => {
     try {
       await dispatch(deleteCategory(categoryToDelete.id)).unwrap();
       toast.success('Kategori başarıyla silindi');
+      onDeleteClose(); // Modal'ı kapat
       setCategoryToDelete(null);
     } catch (error) {
       toast.error(error || 'Kategori silinirken bir hata oluştu');
     }
+  };
+
+  const handleDeleteModalClose = () => {
+    onDeleteClose();
+    setCategoryToDelete(null); // Modal kapanırken state'i temizle
   };
 
   const handleDragStart = (item) => {
@@ -256,7 +262,7 @@ const KategoriPage = () => {
       {/* Silme Onay Modal */}
       <ConfirmModal
         isOpen={isDeleteOpen}
-        onClose={onDeleteClose}
+        onClose={handleDeleteModalClose}
         title="Kategori Sil"
         message={`"${categoryToDelete?.name}" kategorisini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`}
         confirmText="Evet, Sil"

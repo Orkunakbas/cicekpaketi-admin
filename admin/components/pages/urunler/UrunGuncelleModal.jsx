@@ -12,7 +12,7 @@ import {
   Tooltip,
 } from '@heroui/react';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
-import { fetchSingleProduct, deleteVariant } from '@/store/slices/productSlice';
+import { fetchSingleProduct, deleteVariant, deleteProductImage } from '@/store/slices/productSlice';
 import { fetchCategories } from '@/store/slices/categoriesSlice';
 import { fetchOptionTypes, fetchOptionValues } from '@/store/slices/variantSlice';
 import toast from 'react-hot-toast';
@@ -354,19 +354,52 @@ const UrunGuncelleModal = ({ isOpen, onClose, onSuccess, productId }) => {
     });
   };
 
-  const handleImageDelete = (combinationId, imageId) => {
-    const updated = variantCombinations.map(c => {
-      if (c.id === combinationId) {
-        const filteredImages = c.images.filter(img => img.id !== imageId);
-        if (filteredImages.length > 0 && !filteredImages.some(img => img.isCover || img.image_type === 'cover')) {
-          filteredImages[0].isCover = true;
+  const handleImageDelete = async (combinationId, imageId) => {
+    // Önce resmin DB'de olup olmadığını kontrol et
+    const combination = variantCombinations.find(c => c.id === combinationId);
+    const image = combination?.images?.find(img => img.id === imageId);
+    
+    // Eğer resim yeni eklendiyse (henüz DB'de yok), sadece state'ten sil
+    if (image?.isNew) {
+      const updated = variantCombinations.map(c => {
+        if (c.id === combinationId) {
+          const filteredImages = c.images.filter(img => img.id !== imageId);
+          if (filteredImages.length > 0 && !filteredImages.some(img => img.isCover || img.image_type === 'cover')) {
+            filteredImages[0].isCover = true;
+          }
+          return { ...c, images: filteredImages };
         }
-        return { ...c, images: filteredImages };
-      }
-      return c;
-    });
-    setVariantCombinations(updated);
-    toast.success('Resim silindi');
+        return c;
+      });
+      setVariantCombinations(updated);
+      toast.success('Resim silindi');
+      return;
+    }
+    
+    // DB'deki resimse, backend'e istek gönder
+    try {
+      toast.loading('Resim siliniyor...', { id: 'delete-image' });
+      
+      await dispatch(deleteProductImage(imageId)).unwrap();
+      
+      // Başarılı olursa state'ten de sil
+      const updated = variantCombinations.map(c => {
+        if (c.id === combinationId) {
+          const filteredImages = c.images.filter(img => img.id !== imageId);
+          if (filteredImages.length > 0 && !filteredImages.some(img => img.isCover || img.image_type === 'cover')) {
+            filteredImages[0].isCover = true;
+          }
+          return { ...c, images: filteredImages };
+        }
+        return c;
+      });
+      setVariantCombinations(updated);
+      
+      toast.success('Resim başarıyla silindi', { id: 'delete-image' });
+    } catch (error) {
+      console.error('Resim silme hatası:', error);
+      toast.error(error || 'Resim silinirken bir hata oluştu', { id: 'delete-image' });
+    }
   };
 
   const handleSetCover = (combinationId, imageId) => {
@@ -428,13 +461,39 @@ const UrunGuncelleModal = ({ isOpen, onClose, onSuccess, productId }) => {
     });
   };
 
-  const handleSimpleImageDelete = (imageId) => {
-    const filteredImages = formData.images.filter(img => img.id !== imageId);
-    if (filteredImages.length > 0 && !filteredImages.some(img => img.isCover || img.image_type === 'cover')) {
-      filteredImages[0].isCover = true;
+  const handleSimpleImageDelete = async (imageId) => {
+    // Önce resmin DB'de olup olmadığını kontrol et
+    const image = formData.images.find(img => img.id === imageId);
+    
+    // Eğer resim yeni eklendiyse (henüz DB'de yok), sadece state'ten sil
+    if (image?.isNew) {
+      const filteredImages = formData.images.filter(img => img.id !== imageId);
+      if (filteredImages.length > 0 && !filteredImages.some(img => img.isCover || img.image_type === 'cover')) {
+        filteredImages[0].isCover = true;
+      }
+      setFormData(prev => ({ ...prev, images: filteredImages }));
+      toast.success('Resim silindi');
+      return;
     }
-    setFormData(prev => ({ ...prev, images: filteredImages }));
-    toast.success('Resim silindi');
+    
+    // DB'deki resimse, backend'e istek gönder
+    try {
+      toast.loading('Resim siliniyor...', { id: 'delete-image' });
+      
+      await dispatch(deleteProductImage(imageId)).unwrap();
+      
+      // Başarılı olursa state'ten de sil
+      const filteredImages = formData.images.filter(img => img.id !== imageId);
+      if (filteredImages.length > 0 && !filteredImages.some(img => img.isCover || img.image_type === 'cover')) {
+        filteredImages[0].isCover = true;
+      }
+      setFormData(prev => ({ ...prev, images: filteredImages }));
+      
+      toast.success('Resim başarıyla silindi', { id: 'delete-image' });
+    } catch (error) {
+      console.error('Resim silme hatası:', error);
+      toast.error(error || 'Resim silinirken bir hata oluştu', { id: 'delete-image' });
+    }
   };
 
   const handleSimpleSetCover = (imageId) => {
