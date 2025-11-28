@@ -5,7 +5,7 @@ import Table from '@/components/design/table/Table';
 import SiparisDetayModal from './SiparisDetayModal';
 import { Button, Chip, Select, SelectItem, useDisclosure, Input } from '@heroui/react';
 import { fetchOrders } from '@/store/slices/siparisSlice';
-import { FaEye, FaSearch } from 'react-icons/fa';
+import { FaEye } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const SiparisPage = () => {
@@ -14,7 +14,7 @@ const SiparisPage = () => {
   const { isOpen: isDetailOpen, onOpen: onDetailOpen, onClose: onDetailClose } = useDisclosure();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchValue, setSearchValue] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const SiparisPage = () => {
   const loadOrders = () => {
     dispatch(fetchOrders({
       status: statusFilter,
-      search: searchTerm,
+      search: '',
       page: currentPage,
       limit: 20
     }));
@@ -55,6 +55,25 @@ const SiparisPage = () => {
       }
     });
   }, [orders]);
+
+  // Siparişleri filtrele (arama ve durum)
+  const filteredOrders = React.useMemo(() => {
+    let filtered = parsedOrders;
+
+    // Arama filtresi
+    if (searchValue) {
+      filtered = filtered.filter(order => {
+        const searchLower = searchValue.toLowerCase();
+        return (
+          order.order_number?.toLowerCase().includes(searchLower) ||
+          order.customer_name?.toLowerCase().includes(searchLower) ||
+          order.customer_email?.toLowerCase().includes(searchLower)
+        );
+      });
+    }
+
+    return filtered;
+  }, [parsedOrders, searchValue]);
 
   const handleSearch = () => {
     setCurrentPage(1);
@@ -225,19 +244,55 @@ const SiparisPage = () => {
     <div className="p-6">
       <Title>Siparişler</Title>
 
-      {/* Filtreler ve Arama */}
-      <div className="mt-6 flex flex-col sm:flex-row gap-4 items-start sm:items-end justify-between">
-        {/* Sol: Durum Filtresi */}
-        <div className="w-full sm:w-auto">
+      <div className="mt-6">
+        {/* Filtre ve Arama Bölümü */}
+        <div className="flex justify-between items-end gap-3 mb-4">
+          <Input
+            isClearable
+            className="w-full max-w-xs"
+            placeholder="Sipariş no, müşteri adı veya email ara..."
+            variant="bordered"
+            value={searchValue}
+            onValueChange={setSearchValue}
+            onClear={() => setSearchValue('')}
+            startContent={
+              <svg
+                aria-hidden="true"
+                fill="none"
+                focusable="false"
+                height="1em"
+                role="presentation"
+                viewBox="0 0 24 24"
+                width="1em"
+              >
+                <path
+                  d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M22 22L20 20"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                />
+              </svg>
+            }
+          />
+          
           <Select
             label="Sipariş Durumu"
             placeholder="Tüm Siparişler"
+            variant="bordered"
             selectedKeys={[statusFilter]}
             onChange={(e) => {
               setStatusFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full sm:w-[240px]"
+            className="w-full md:w-[280px]"
             classNames={{
               label: "text-white",
               value: "text-white"
@@ -253,38 +308,14 @@ const SiparisPage = () => {
           </Select>
         </div>
 
-        {/* Sağ: Arama */}
-        <div className="flex gap-2 w-full sm:w-auto sm:flex-1 sm:max-w-md">
-          <Input
-            placeholder="Sipariş no, müşteri adı veya email ara..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            className="flex-1"
-            classNames={{
-              label: "text-white",
-              input: "text-white"
-            }}
-          />
-          <Button
-            color="secondary"
-            onPress={handleSearch}
-            className="min-w-[100px]"
-          >
-            <FaSearch className="mr-2" />
-            Ara
-          </Button>
-        </div>
-      </div>
-      
-      <div className="mt-6">
         <Table
           columns={columns}
-          data={parsedOrders}
+          data={filteredOrders}
           pagination={true}
           rowsPerPage={20}
           isLoading={isLoading}
           emptyText="Henüz sipariş yok"
+          searchable={false}
         />
       </div>
 

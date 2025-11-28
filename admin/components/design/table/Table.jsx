@@ -103,7 +103,7 @@ const Table = ({
         {searchable && (
           <Input
             isClearable
-            className="w-40"
+            className="w-full max-w-xs"
             placeholder={searchPlaceholder}
             variant="bordered"
             startContent={<SearchIcon />}
