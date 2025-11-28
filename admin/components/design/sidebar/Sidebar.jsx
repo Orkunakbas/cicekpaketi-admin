@@ -16,8 +16,7 @@ import { BiCategory } from "react-icons/bi";
 
 
 
-import { HiLanguage } from "react-icons/hi2";
-import { HiOutlinePencilSquare } from "react-icons/hi2";
+import { HiLanguage, HiOutlinePencilSquare, HiOutlineCube, HiOutlineClipboardDocumentList, HiOutlineUsers, HiOutlineCubeTransparent } from "react-icons/hi2";
 
 
 
@@ -26,7 +25,7 @@ import { HiOutlinePencilSquare } from "react-icons/hi2";
 
 
 
-import { FaHome, FaUsers, FaFileAlt, FaCog, FaSignOutAlt, FaChevronLeft, FaChevronRight, FaChevronDown, FaUserPlus, FaUserEdit, FaUserShield, FaPlus, FaEdit, FaTrash, FaInfoCircle, FaFile, FaBox, FaNewspaper, FaBlog, FaHandshake, FaVideo, FaQuestionCircle, FaWpforms, FaLanguage, FaCubes, FaMinus, FaClipboardList } from 'react-icons/fa';
+import { FaHome, FaFileAlt, FaCog, FaSignOutAlt, FaChevronLeft, FaChevronRight, FaChevronDown, FaUserPlus, FaUserEdit, FaUserShield, FaPlus, FaEdit, FaTrash, FaInfoCircle, FaFile, FaNewspaper, FaBlog, FaHandshake, FaVideo, FaQuestionCircle, FaWpforms, FaLanguage, FaMinus } from 'react-icons/fa';
 import { FaRegImages } from 'react-icons/fa6';
 import { AiOutlineRight } from 'react-icons/ai';
 import { Avatar } from '@heroui/react';
@@ -42,22 +41,15 @@ const Sidebar = () => {
 
   // Bekleyen sipariş sayısını getir
   useEffect(() => {
-    console.log('🔍 Bekleyen sipariş sayısı getiriliyor...');
     dispatch(fetchPendingOrdersCount());
     
     // Her 30 saniyede bir güncelle
     const interval = setInterval(() => {
-      console.log('🔄 Bekleyen sipariş sayısı güncelleniyor...');
       dispatch(fetchPendingOrdersCount());
     }, 30000);
 
     return () => clearInterval(interval);
   }, [dispatch]);
-
-  // Debug: pendingCount'u console'a yazdır
-  useEffect(() => {
-    console.log('📊 Bekleyen sipariş sayısı:', pendingCount);
-  }, [pendingCount]);
 
   const handleLogout = () => {
     dispatch(clearCredentials());
@@ -96,25 +88,25 @@ const Sidebar = () => {
       key: 'kategoriler'
     },
     { 
-      icon: FaCubes, 
+      icon: HiOutlineCubeTransparent, 
       label: 'Varyantlar', 
       path: '/varyantlar',
       key: 'varyantlar'
     },
     { 
-      icon: FaBox, 
+      icon: HiOutlineCube, 
       label: 'Ürünler', 
       path: '/urunler',
       key: 'urunler'
     },
     { 
-      icon: FaClipboardList, 
+      icon: HiOutlineClipboardDocumentList, 
       label: 'Siparişler', 
       path: '/siparisler',
       key: 'siparisler'
     },
     { 
-      icon: FaUsers, 
+      icon: HiOutlineUsers, 
       label: 'Kullanıcılar', 
       path: '/kullanicilar',
       key: 'kullanicilar'
@@ -288,21 +280,13 @@ const Sidebar = () => {
                         <item.icon className="w-5 h-5" />
                         {/* Bekleyen sipariş badge'i */}
                         {item.key === 'siparisler' && pendingCount > 0 && (
-                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          <span className="absolute -top-1 -right-1 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg animate-pulse" style={{ backgroundColor: '#f9ed32' }}>
                             {pendingCount > 9 ? '9+' : pendingCount}
                           </span>
                         )}
                       </div>
                       {!sidebarCollapsed && (
-                        <div className="relative z-10 flex-1 flex items-center justify-between">
-                          <span className="font-medium">{item.label}</span>
-                          {/* Bekleyen sipariş badge'i (expanded) */}
-                          {item.key === 'siparisler' && pendingCount > 0 && (
-                            <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5 min-w-[24px] text-center">
-                              {pendingCount}
-                            </span>
-                          )}
-                        </div>
+                        <span className="relative z-10 flex-1 text-left font-medium">{item.label}</span>
                       )}
                     </button>
                   </li>

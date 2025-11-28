@@ -473,18 +473,6 @@ exports.updateOrder = async (req, res) => {
 // Bekleyen sipariş sayısını getir
 exports.getPendingOrdersCount = async (req, res) => {
   try {
-    console.log('🔍 Bekleyen sipariş sayısı API çağrıldı');
-    
-    // Tüm siparişleri kontrol et
-    const allOrders = await Order.findAll({
-      attributes: ['id', 'order_number', 'order_status']
-    });
-    console.log('📦 Tüm siparişler:', allOrders.map(o => ({ 
-      id: o.id, 
-      order_number: o.order_number, 
-      order_status: o.order_status 
-    })));
-
     const count = await Order.count({
       where: {
         order_status: {
@@ -492,8 +480,6 @@ exports.getPendingOrdersCount = async (req, res) => {
         }
       }
     });
-
-    console.log('✅ Bekleyen sipariş sayısı:', count);
 
     res.json({
       success: true,
