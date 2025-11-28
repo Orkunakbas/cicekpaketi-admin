@@ -4,7 +4,7 @@ import Title from '@/components/design/title/Title';
 import Table from '@/components/design/table/Table';
 import SiparisDetayModal from './SiparisDetayModal';
 import { Button, Chip, Select, SelectItem, useDisclosure, Input } from '@heroui/react';
-import { fetchOrders } from '@/store/slices/siparisSlice';
+import { fetchOrders, updateOrder } from '@/store/slices/siparisSlice';
 import { FaEye } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
@@ -89,15 +89,42 @@ const SiparisPage = () => {
     loadOrders();
   };
 
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      await dispatch(updateOrder({
+        id: orderId,
+        orderData: { order_status: newStatus }
+      })).unwrap();
+      
+      toast.success('Sipariş durumu güncellendi');
+      loadOrders();
+    } catch (error) {
+      toast.error(error || 'Durum güncellenirken hata oluştu');
+    }
+  };
+
+  const handlePaymentStatusChange = async (orderId, newStatus) => {
+    try {
+      await dispatch(updateOrder({
+        id: orderId,
+        orderData: { payment_status: newStatus }
+      })).unwrap();
+      
+      toast.success('Ödeme durumu güncellendi');
+      loadOrders();
+    } catch (error) {
+      toast.error(error || 'Durum güncellenirken hata oluştu');
+    }
+  };
+
   // Sipariş durumu renkleri
   const getStatusColor = (status) => {
     const colors = {
       pending: 'warning',
-      confirmed: 'primary',
-      processing: 'secondary',
-      shipped: 'default',
+      preparing: 'primary',
       delivered: 'success',
-      cancelled: 'danger'
+      cancelled: 'danger',
+      refunded: 'default'
     };
     return colors[status] || 'default';
   };
@@ -106,11 +133,11 @@ const SiparisPage = () => {
   const getStatusText = (status) => {
     const texts = {
       pending: 'Beklemede',
-      confirmed: 'Onaylandı',
-      processing: 'Hazırlanıyor',
+      preparing: 'Hazırlanıyor',
       shipped: 'Kargoda',
       delivered: 'Teslim Edildi',
-      cancelled: 'İptal Edildi'
+      cancelled: 'İptal Edildi',
+      refunded: 'İade Edildi'
     };
     return texts[status] || status;
   };
@@ -119,7 +146,7 @@ const SiparisPage = () => {
   const getPaymentStatusColor = (status) => {
     const colors = {
       pending: 'warning',
-      completed: 'success',
+      paid: 'success',
       failed: 'danger',
       refunded: 'default'
     };
@@ -130,7 +157,7 @@ const SiparisPage = () => {
   const getPaymentStatusText = (status) => {
     const texts = {
       pending: 'Beklemede',
-      completed: 'Ödendi',
+      paid: 'Ödendi',
       failed: 'Başarısız',
       refunded: 'İade Edildi'
     };
@@ -196,9 +223,25 @@ const SiparisPage = () => {
       label: 'Sipariş Durumu',
       sortable: true,
       render: (order) => (
-        <Chip color={getStatusColor(order.order_status)} size="sm" variant="flat">
-          {getStatusText(order.order_status)}
-        </Chip>
+        <Select
+          size="sm"
+          variant="flat"
+          color={order.order_status === 'shipped' ? 'default' : getStatusColor(order.order_status)}
+          selectedKeys={[order.order_status]}
+          onChange={(e) => handleStatusChange(order.id, e.target.value)}
+          className="min-w-[140px]"
+          classNames={{
+            value: order.order_status === 'shipped' ? "text-purple-400 text-xs font-medium" : "text-xs font-medium",
+            trigger: order.order_status === 'shipped' ? "bg-purple-600/20 data-[hover=true]:bg-purple-600/30" : ""
+          }}
+        >
+          <SelectItem key="pending" value="pending">Beklemede</SelectItem>
+          <SelectItem key="preparing" value="preparing">Hazırlanıyor</SelectItem>
+          <SelectItem key="shipped" value="shipped">Kargoda</SelectItem>
+          <SelectItem key="delivered" value="delivered">Teslim Edildi</SelectItem>
+          <SelectItem key="cancelled" value="cancelled">İptal Edildi</SelectItem>
+          <SelectItem key="refunded" value="refunded">İade Edildi</SelectItem>
+        </Select>
       ),
     },
     {
@@ -206,9 +249,22 @@ const SiparisPage = () => {
       label: 'Ödeme Durumu',
       sortable: true,
       render: (order) => (
-        <Chip color={getPaymentStatusColor(order.payment_status)} size="sm" variant="flat">
-          {getPaymentStatusText(order.payment_status)}
-        </Chip>
+        <Select
+          size="sm"
+          variant="flat"
+          color={getPaymentStatusColor(order.payment_status)}
+          selectedKeys={[order.payment_status]}
+          onChange={(e) => handlePaymentStatusChange(order.id, e.target.value)}
+          className="min-w-[120px]"
+          classNames={{
+            value: "text-white text-xs font-medium"
+          }}
+        >
+          <SelectItem key="pending" value="pending">Beklemede</SelectItem>
+          <SelectItem key="paid" value="paid">Ödendi</SelectItem>
+          <SelectItem key="failed" value="failed">Başarısız</SelectItem>
+          <SelectItem key="refunded" value="refunded">İade Edildi</SelectItem>
+        </Select>
       ),
     },
     {
@@ -300,11 +356,11 @@ const SiparisPage = () => {
           >
             <SelectItem key="all" value="all">Tüm Siparişler</SelectItem>
             <SelectItem key="pending" value="pending">Beklemede</SelectItem>
-            <SelectItem key="confirmed" value="confirmed">Onaylandı</SelectItem>
-            <SelectItem key="processing" value="processing">Hazırlanıyor</SelectItem>
+            <SelectItem key="preparing" value="preparing">Hazırlanıyor</SelectItem>
             <SelectItem key="shipped" value="shipped">Kargoda</SelectItem>
             <SelectItem key="delivered" value="delivered">Teslim Edildi</SelectItem>
             <SelectItem key="cancelled" value="cancelled">İptal Edildi</SelectItem>
+            <SelectItem key="refunded" value="refunded">İade Edildi</SelectItem>
           </Select>
         </div>
 

@@ -38,6 +38,31 @@ export const fetchOrders = createAsyncThunk(
   }
 );
 
+// Bekleyen sipariş sayısını getir
+export const fetchPendingOrdersCount = createAsyncThunk(
+  'siparis/fetchPendingOrdersCount',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch(getApiUrl('/api/orders/admin/pending-count'), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return rejectWithValue(data.message || 'Bekleyen sipariş sayısı alınamadı');
+      }
+
+      return data.data.count;
+    } catch (error) {
+      return rejectWithValue('Bağlantı hatası');
+    }
+  }
+);
+
 // Tek sipariş getir
 export const fetchSingleOrder = createAsyncThunk(
   'siparis/fetchSingleOrder',
@@ -94,6 +119,7 @@ const siparisSlice = createSlice({
   initialState: {
     orders: [],
     selectedOrder: null,
+    pendingCount: 0,
     isLoading: false,
     error: null,
     successMessage: null,
@@ -169,6 +195,11 @@ const siparisSlice = createSlice({
       .addCase(updateOrder.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+      
+      // Fetch Pending Orders Count
+      .addCase(fetchPendingOrdersCount.fulfilled, (state, action) => {
+        state.pendingCount = action.payload;
       });
   },
 });

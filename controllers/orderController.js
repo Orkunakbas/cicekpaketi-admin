@@ -5,6 +5,7 @@ const CartItem = require('../models/cartItemModel');
 const Product = require('../models/productModel');
 const ProductVariant = require('../models/productVariantModel');
 const Image = require('../models/imageModel');
+const { Op } = require('sequelize');
 
 // Sipariş numarası oluştur (örn: ÇP-324833)
 const generateOrderNumber = () => {
@@ -464,6 +465,46 @@ exports.updateOrder = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Sipariş güncellenirken hata oluştu',
+      error: error.message
+    });
+  }
+};
+
+// Bekleyen sipariş sayısını getir
+exports.getPendingOrdersCount = async (req, res) => {
+  try {
+    console.log('🔍 Bekleyen sipariş sayısı API çağrıldı');
+    
+    // Tüm siparişleri kontrol et
+    const allOrders = await Order.findAll({
+      attributes: ['id', 'order_number', 'order_status']
+    });
+    console.log('📦 Tüm siparişler:', allOrders.map(o => ({ 
+      id: o.id, 
+      order_number: o.order_number, 
+      order_status: o.order_status 
+    })));
+
+    const count = await Order.count({
+      where: {
+        order_status: {
+          [Op.in]: ['pending', 'preparing']
+        }
+      }
+    });
+
+    console.log('✅ Bekleyen sipariş sayısı:', count);
+
+    res.json({
+      success: true,
+      data: { count }
+    });
+
+  } catch (error) {
+    console.error('❌ Bekleyen sipariş sayısı hatası:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Bekleyen sipariş sayısı alınırken hata oluştu',
       error: error.message
     });
   }

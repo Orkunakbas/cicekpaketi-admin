@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { Button } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clearCredentials, toggleSidebar } from '../../../store/slices/adminSlice';
+import { fetchPendingOrdersCount } from '../../../store/slices/siparisSlice';
 import { AiOutlineHome } from "react-icons/ai";
 import { BiCategory } from "react-icons/bi";
 
@@ -36,7 +37,27 @@ const Sidebar = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { user, sidebarCollapsed } = useSelector((state) => state.admin);
+  const { pendingCount } = useSelector((state) => state.siparis);
   const [expandedMenus, setExpandedMenus] = useState({});
+
+  // Bekleyen sipariş sayısını getir
+  useEffect(() => {
+    console.log('🔍 Bekleyen sipariş sayısı getiriliyor...');
+    dispatch(fetchPendingOrdersCount());
+    
+    // Her 30 saniyede bir güncelle
+    const interval = setInterval(() => {
+      console.log('🔄 Bekleyen sipariş sayısı güncelleniyor...');
+      dispatch(fetchPendingOrdersCount());
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
+  // Debug: pendingCount'u console'a yazdır
+  useEffect(() => {
+    console.log('📊 Bekleyen sipariş sayısı:', pendingCount);
+  }, [pendingCount]);
 
   const handleLogout = () => {
     dispatch(clearCredentials());
@@ -265,9 +286,23 @@ const Sidebar = () => {
                           : "border-gray-700 group-hover:scale-105 group-hover:border-gray-600"
                       )}>
                         <item.icon className="w-5 h-5" />
+                        {/* Bekleyen sipariş badge'i */}
+                        {item.key === 'siparisler' && pendingCount > 0 && (
+                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                            {pendingCount > 9 ? '9+' : pendingCount}
+                          </span>
+                        )}
                       </div>
                       {!sidebarCollapsed && (
-                        <span className="relative z-10 flex-1 text-left font-medium">{item.label}</span>
+                        <div className="relative z-10 flex-1 flex items-center justify-between">
+                          <span className="font-medium">{item.label}</span>
+                          {/* Bekleyen sipariş badge'i (expanded) */}
+                          {item.key === 'siparisler' && pendingCount > 0 && (
+                            <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5 min-w-[24px] text-center">
+                              {pendingCount}
+                            </span>
+                          )}
+                        </div>
                       )}
                     </button>
                   </li>
