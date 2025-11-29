@@ -6,10 +6,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 // Bu Ay İstatistikleri
 export const fetchMonthlyStats = createAsyncThunk(
   'dashboard/fetchMonthlyStats',
-  async (_, { rejectWithValue }) => {
+  async (period = 'month', { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('admin_token');
-      const response = await axios.get(`${API_URL}/api/dashboard/monthly-stats`, {
+      const response = await axios.get(`${API_URL}/api/dashboard/monthly-stats?period=${period}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data.data;

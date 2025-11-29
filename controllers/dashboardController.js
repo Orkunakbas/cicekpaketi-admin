@@ -8,9 +8,49 @@ const sequelize = require('../database');
 // Bu Ay İstatistikleri
 exports.getMonthlyStats = async (req, res) => {
   try {
+    const { period = 'month' } = req.query; // 'month', 'week', 'month30'
     const now = new Date();
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    
+    let startDate, endDate, prevStartDate, prevEndDate;
+    
+    if (period === 'week') {
+      // Son 7 gün
+      startDate = new Date(now);
+      startDate.setDate(startDate.getDate() - 7);
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date(now);
+      endDate.setHours(23, 59, 59, 999);
+      
+      // Önceki 7 gün (trend için)
+      prevStartDate = new Date(startDate);
+      prevStartDate.setDate(prevStartDate.getDate() - 7);
+      prevEndDate = new Date(startDate);
+      prevEndDate.setHours(23, 59, 59, 999);
+    } else if (period === 'month30') {
+      // Son 30 gün
+      startDate = new Date(now);
+      startDate.setDate(startDate.getDate() - 30);
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date(now);
+      endDate.setHours(23, 59, 59, 999);
+      
+      // Önceki 30 gün (trend için)
+      prevStartDate = new Date(startDate);
+      prevStartDate.setDate(prevStartDate.getDate() - 30);
+      prevEndDate = new Date(startDate);
+      prevEndDate.setHours(23, 59, 59, 999);
+    } else {
+      // Bu ay (default)
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      
+      // Geçen ay (trend için)
+      prevStartDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      prevEndDate = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+    }
+    
+    const firstDayOfMonth = startDate;
+    const lastDayOfMonth = endDate;
 
     // Bu Ay Hasılat (sadece paid siparişler)
     const monthlyRevenue = await Order.sum('total_amount', {
@@ -54,14 +94,11 @@ exports.getMonthlyStats = async (req, res) => {
       }
     });
 
-    // Geçen ayın verilerini de alalım (trend için)
-    const firstDayOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const lastDayOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
-
+    // Önceki periyodun verilerini de alalım (trend için)
     const lastMonthRevenue = await Order.sum('total_amount', {
       where: {
         created_at: {
-          [Op.between]: [firstDayOfLastMonth, lastDayOfLastMonth]
+          [Op.between]: [prevStartDate, prevEndDate]
         },
         payment_status: 'paid'
       }
@@ -70,7 +107,7 @@ exports.getMonthlyStats = async (req, res) => {
     const lastMonthOrders = await Order.count({
       where: {
         created_at: {
-          [Op.between]: [firstDayOfLastMonth, lastDayOfLastMonth]
+          [Op.between]: [prevStartDate, prevEndDate]
         }
       }
     });
@@ -81,7 +118,7 @@ exports.getMonthlyStats = async (req, res) => {
       ],
       where: {
         created_at: {
-          [Op.between]: [firstDayOfLastMonth, lastDayOfLastMonth]
+          [Op.between]: [prevStartDate, prevEndDate]
         },
         payment_status: 'paid'
       },
@@ -91,7 +128,7 @@ exports.getMonthlyStats = async (req, res) => {
     const lastMonthUsers = await User.count({
       where: {
         created_at: {
-          [Op.between]: [firstDayOfLastMonth, lastDayOfLastMonth]
+          [Op.between]: [prevStartDate, prevEndDate]
         }
       }
     });

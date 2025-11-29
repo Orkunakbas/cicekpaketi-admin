@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import Title from '@/components/design/title/Title';
 import TotalDegerler from './TotalDegerler';
@@ -14,14 +14,15 @@ import {
 
 const DashboardPage = () => {
   const dispatch = useDispatch();
+  const [selectedPeriod, setSelectedPeriod] = useState('month'); // 'month', 'week', 'month30'
 
   useEffect(() => {
-    // Tüm dashboard verilerini çek
-    dispatch(fetchMonthlyStats());
+    // Seçilen periyoda göre verileri çek
+    dispatch(fetchMonthlyStats(selectedPeriod));
     dispatch(fetchTotalStats());
     dispatch(fetchTopProducts());
     dispatch(fetchRecentUsers());
-  }, [dispatch]);
+  }, [dispatch, selectedPeriod]);
 
   return (
     <div className="px-6 pb-10">
@@ -33,13 +34,34 @@ const DashboardPage = () => {
             Performans
           </h2>
           <div className="flex items-center gap-2 bg-gray-800/40 border border-gray-700/40 rounded-xl p-1">
-            <button className="px-4 py-1.5 text-xs font-medium bg-gray-700/60 text-white rounded-lg transition-all duration-200">
+            <button 
+              onClick={() => setSelectedPeriod('month')}
+              className={`px-4 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
+                selectedPeriod === 'month' 
+                  ? 'bg-gray-700/60 text-white' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
               Bu Ay
             </button>
-            <button className="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white rounded-lg transition-all duration-200">
+            <button 
+              onClick={() => setSelectedPeriod('week')}
+              className={`px-4 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
+                selectedPeriod === 'week' 
+                  ? 'bg-gray-700/60 text-white' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
               Son 7 Gün
             </button>
-            <button className="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white rounded-lg transition-all duration-200">
+            <button 
+              onClick={() => setSelectedPeriod('month30')}
+              className={`px-4 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
+                selectedPeriod === 'month30' 
+                  ? 'bg-gray-700/60 text-white' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
               Son 30 Gün
             </button>
           </div>
