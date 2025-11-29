@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @config "../hero.ts";
+@import "./editor.css";
 
 /* Dark Mode Colors */
 :root.dark {
@@ -137,12 +138,3 @@ body.dark,
   background-color: #33344f;
  
 }
-
-
-
-
-
-
-
-
-

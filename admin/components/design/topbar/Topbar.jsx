@@ -93,7 +93,7 @@ const Topbar = () => {
   };
 
   return (
-    <div className="border-b border-divider bg-dark sticky top-0 shadow-sm relative z-[150]">
+    <div className="border-b border-divider bg-dark sticky top-0 shadow-sm relative">
       {/* Ana Topbar */}
       <motion.div 
         className="px-6 py-4 flex items-center justify-between h-[73px] box-border"

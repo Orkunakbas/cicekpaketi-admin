@@ -3,6 +3,7 @@ import adminSlice from './slices/adminSlice';
 import languageSlice from './slices/languageSlice';
 import categoriesSlice from './slices/categoriesSlice.js';
 import bannersSlice from './slices/bannerSlice';
+import termSlice from './slices/termSlice';
 import siparisSlice from './slices/siparisSlice';
 import userSlice from './slices/userSlice';
 import variantSlice from './slices/variantSlice';
@@ -14,6 +15,7 @@ export const store = configureStore({
     language: languageSlice,
     categories: categoriesSlice,
     banners: bannersSlice,
+    terms: termSlice,
     siparis: siparisSlice,
     users: userSlice,
     variant: variantSlice,

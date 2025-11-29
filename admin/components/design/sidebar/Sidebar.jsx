@@ -16,7 +16,7 @@ import { BiCategory } from "react-icons/bi";
 
 
 
-import { HiLanguage, HiOutlinePencilSquare, HiOutlineCube, HiOutlineClipboardDocumentList, HiOutlineUsers, HiOutlineCubeTransparent } from "react-icons/hi2";
+import { HiLanguage, HiOutlinePencilSquare, HiOutlineCube, HiOutlineClipboardDocumentList, HiOutlineUsers, HiOutlineCubeTransparent, HiOutlineDocumentText } from "react-icons/hi2";
 
 
 
@@ -110,6 +110,12 @@ const Sidebar = () => {
       label: 'Kullanıcılar', 
       path: '/kullanicilar',
       key: 'kullanicilar'
+    },
+    { 
+      icon: HiOutlineDocumentText, 
+      label: 'Sözleşmeler', 
+      path: '/sozlesmeler',
+      key: 'sozlesmeler'
     },
     /* { 
         icon: AiOutlineMenu, 

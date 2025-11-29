@@ -18,7 +18,6 @@ const Term = sequelize.define('Term', {
   language_code: {
     type: DataTypes.STRING(10),
     allowNull: false,
-    defaultValue: 'tr'
   },
   rank: {
     type: DataTypes.INTEGER,
