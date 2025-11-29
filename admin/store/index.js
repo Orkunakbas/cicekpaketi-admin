@@ -9,6 +9,7 @@ import userSlice from './slices/userSlice';
 import variantSlice from './slices/variantSlice';
 import productSlice from './slices/productSlice';
 import dashboardSlice from './slices/dashboardSlice';
+import degerlendirmeSlice from './slices/degerlendirmeSlice';
  
 export const store = configureStore({
   reducer: {
@@ -22,5 +23,6 @@ export const store = configureStore({
     variant: variantSlice,
     products: productSlice,
     dashboard: dashboardSlice,
+    degerlendirme: degerlendirmeSlice,
   },
 }); 

@@ -2,6 +2,7 @@ const Product = require('../models/productModel');
 const ProductVariant = require('../models/productVariantModel');
 const Image = require('../models/imageModel');
 const Category = require('../models/categoryModel');
+const Review = require('../models/reviewModel');
 const { Op } = require('sequelize');
 
 // ============================================
@@ -240,6 +241,24 @@ exports.getProductsByCategory = async (req, res) => {
           }
         }
 
+        // Ürün değerlendirmelerini getir (sadece onaylı)
+        const reviews = await Review.findAll({
+          where: {
+            product_id: product.id,
+            is_approved: true
+          },
+          attributes: ['rating'],
+          raw: true
+        });
+
+        let avgRating = 0;
+        let reviewCount = reviews.length;
+        
+        if (reviewCount > 0) {
+          const totalRating = reviews.reduce((sum, r) => sum + r.rating, 0);
+          avgRating = parseFloat((totalRating / reviewCount).toFixed(1));
+        }
+
         return { 
           id: product.id,
           name: product.name,
@@ -261,6 +280,8 @@ exports.getProductsByCategory = async (req, res) => {
           maxPrice,
           minDiscount,
           maxDiscount,
+          avgRating,
+          reviewCount,
           variants: variantsWithImages,
           created_at: product.created_at,
           updated_at: product.updated_at
@@ -624,6 +645,24 @@ exports.searchProducts = async (req, res) => {
             maxDiscount = Math.max(...discounts);
           }
         }
+
+        // Ürün değerlendirmelerini getir (sadece onaylı)
+        const reviews = await Review.findAll({
+          where: {
+            product_id: product.id,
+            is_approved: true
+          },
+          attributes: ['rating'],
+          raw: true
+        });
+
+        let avgRating = 0;
+        let reviewCount = reviews.length;
+        
+        if (reviewCount > 0) {
+          const totalRating = reviews.reduce((sum, r) => sum + r.rating, 0);
+          avgRating = parseFloat((totalRating / reviewCount).toFixed(1));
+        }
         
         return {
           id: product.id,
@@ -635,6 +674,8 @@ exports.searchProducts = async (req, res) => {
           maxPrice: maxDiscount || maxPrice || minPrice || 0,
           minDiscount,
           maxDiscount,
+          avgRating,
+          reviewCount,
           is_variant: product.is_variant
         };
       })
@@ -805,6 +846,24 @@ exports.getFeaturedProducts = async (req, res) => {
           }
         }
 
+        // Ürün değerlendirmelerini getir (sadece onaylı)
+        const reviews = await Review.findAll({
+          where: {
+            product_id: product.id,
+            is_approved: true
+          },
+          attributes: ['rating'],
+          raw: true
+        });
+
+        let avgRating = 0;
+        let reviewCount = reviews.length;
+        
+        if (reviewCount > 0) {
+          const totalRating = reviews.reduce((sum, r) => sum + r.rating, 0);
+          avgRating = parseFloat((totalRating / reviewCount).toFixed(1));
+        }
+
         // Kategori isimlerini al
         let parsedCategoryIds = [];
         let categoryNames = [];
@@ -856,6 +915,8 @@ exports.getFeaturedProducts = async (req, res) => {
           maxPrice,
           minDiscountPrice,
           maxDiscountPrice,
+          avgRating,
+          reviewCount,
           variants: variantsWithImages
         };
       })

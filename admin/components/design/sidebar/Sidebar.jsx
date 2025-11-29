@@ -14,7 +14,8 @@ import {
   HiOutlineCube,
   HiOutlineClipboardDocumentList,
   HiOutlineUsers,
-  HiOutlineDocumentText
+  HiOutlineDocumentText,
+  HiOutlineStar
 } from "react-icons/hi2";
 import { FaSignOutAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { AiOutlineRight } from 'react-icons/ai';
@@ -100,6 +101,12 @@ const Sidebar = () => {
       label: 'Kullanıcılar', 
       path: '/kullanicilar',
       key: 'kullanicilar'
+    },
+    { 
+      icon: HiOutlineStar, 
+      label: 'Değerlendirmeler', 
+      path: '/degerlendirmeler',
+      key: 'degerlendirmeler'
     },
     { 
       icon: HiOutlineDocumentText, 

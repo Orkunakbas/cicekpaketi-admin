@@ -280,3 +280,4 @@ const termSlice = createSlice({
 export const { clearError, clearSuccessMessage, clearSelectedTerm } = termSlice.actions;
 export default termSlice.reducer;
 
+
