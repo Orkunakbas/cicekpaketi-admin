@@ -3,13 +3,10 @@ import { useSelector } from 'react-redux';
 import { FaUserPlus } from 'react-icons/fa';
 
 const EnSonUyeList = () => {
-  const { recentUsers, loading } = useSelector((state) => state.dashboard);
-
-  if (loading.recentUsers) {
-    return <div className="text-white">Yükleniyor...</div>;
-  }
+  const { recentUsers } = useSelector((state) => state.dashboard);
 
   const getInitials = (name) => {
+    if (!name) return 'N/A';
     return name
       .split(' ')
       .map(word => word[0])

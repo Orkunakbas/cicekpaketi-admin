@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 
 const TotalDegerler = () => {
-  const { totalStats, loading } = useSelector((state) => state.dashboard);
+  const { totalStats } = useSelector((state) => state.dashboard);
 
   // API'den gelen verileri kullan
   const stats = [
@@ -44,10 +44,6 @@ const TotalDegerler = () => {
       ]
     },
   ];
-
-  if (loading.totalStats) {
-    return <div className="text-white">Yükleniyor...</div>;
-  }
 
   return (
     <div className="space-y-3">

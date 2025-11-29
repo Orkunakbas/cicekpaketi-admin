@@ -4,11 +4,7 @@ import { FaTrophy, FaShoppingBag } from 'react-icons/fa';
 import Image from 'next/image';
 
 const EnCokSatanUrunler = () => {
-  const { topProducts, loading } = useSelector((state) => state.dashboard);
-
-  if (loading.topProducts) {
-    return <div className="text-white">Yükleniyor...</div>;
-  }
+  const { topProducts } = useSelector((state) => state.dashboard);
 
   return (
     <div className="border border-gray-700/40 rounded-2xl p-6 hover:border-gray-600/50 transition-all duration-300" style={{ backgroundColor: '#1d1d2b' }}>

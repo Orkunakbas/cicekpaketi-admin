@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { FaMoneyBillWave, FaChartLine, FaShoppingBag, FaUserPlus, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 
 const BuAykiDegerler = () => {
-  const { monthlyStats, loading } = useSelector((state) => state.dashboard);
+  const { monthlyStats } = useSelector((state) => state.dashboard);
 
   // Format number as K (thousands)
   const formatNumber = (num) => {
@@ -63,10 +63,6 @@ const BuAykiDegerler = () => {
       },
     ]
   };
-
-  if (loading.monthlyStats) {
-    return <div className="text-white">Yükleniyor...</div>;
-  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
