@@ -1,10 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const dashboardController = require('../controllers/dashboardController');
-const authMiddleware = require('../middleware/authMiddleware');
-
-// Tüm dashboard endpointleri token gerektirir
-router.use(authMiddleware);
 
 // Bu Ay İstatistikleri
 router.get('/monthly-stats', dashboardController.getMonthlyStats);
