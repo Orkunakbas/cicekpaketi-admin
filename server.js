@@ -39,6 +39,7 @@ app.use('/api/addresses', require('./routes/addressRoute'));
 app.use('/api/cart', require('./routes/cartRoute'));
 app.use('/api/orders', require('./routes/orderRoute'));
 app.use('/api/dashboard', require('./routes/dashboardRoute'));
+app.use('/api/reviews', require('./routes/reviewRoute'));
 
 
 // Production modunda Next.js build'ini serve et
