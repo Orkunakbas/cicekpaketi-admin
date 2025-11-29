@@ -162,11 +162,7 @@ const SozlesmelerPage = () => {
 
   return (
     <div className="p-6">
-      <Title 
-        title="Sözleşmeler" 
-        subtitle="Gizlilik sözleşmesi, kullanım koşulları vb. yönetin"
-        showBackButton={false}
-      />
+      <Title>Sözleşmeler</Title>
       
       <div className="mt-6">
         <Table

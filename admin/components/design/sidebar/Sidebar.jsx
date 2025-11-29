@@ -5,28 +5,18 @@ import { Button } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clearCredentials, toggleSidebar } from '../../../store/slices/adminSlice';
 import { fetchPendingOrdersCount } from '../../../store/slices/siparisSlice';
-import { AiOutlineHome } from "react-icons/ai";
-import { BiCategory } from "react-icons/bi";
-
-
-
-
-
-
-
-
-
-import { HiLanguage, HiOutlinePencilSquare, HiOutlineCube, HiOutlineClipboardDocumentList, HiOutlineUsers, HiOutlineCubeTransparent, HiOutlineDocumentText } from "react-icons/hi2";
-
-
-
-
-
-
-
-
-import { FaHome, FaFileAlt, FaCog, FaSignOutAlt, FaChevronLeft, FaChevronRight, FaChevronDown, FaUserPlus, FaUserEdit, FaUserShield, FaPlus, FaEdit, FaTrash, FaInfoCircle, FaFile, FaNewspaper, FaBlog, FaHandshake, FaVideo, FaQuestionCircle, FaWpforms, FaLanguage, FaMinus } from 'react-icons/fa';
-import { FaRegImages } from 'react-icons/fa6';
+// All icons from HeroIcons v2 for consistent stroke width (1.5px)
+import { 
+  HiOutlineHome,
+  HiOutlinePhoto,
+  HiOutlineSquares2X2,
+  HiOutlineCubeTransparent,
+  HiOutlineCube,
+  HiOutlineClipboardDocumentList,
+  HiOutlineUsers,
+  HiOutlineDocumentText
+} from "react-icons/hi2";
+import { FaSignOutAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { AiOutlineRight } from 'react-icons/ai';
 import { Avatar } from '@heroui/react';
 import { cn } from '@heroui/react';
@@ -70,19 +60,19 @@ const Sidebar = () => {
 
   const menuItems = [
     { 
-      icon: AiOutlineHome, 
+      icon: HiOutlineHome, 
       label: 'Dashboard', 
       path: '/',
       key: 'dashboard'
     },
     { 
-      icon: FaRegImages, 
+      icon: HiOutlinePhoto, 
       label: 'Banner\'lar', 
       path: '/bannerlar',
       key: 'bannerlar'
     },
     { 
-      icon: BiCategory, 
+      icon: HiOutlineSquares2X2, 
       label: 'Kategoriler', 
       path: '/kategoriler',
       key: 'kategoriler'
