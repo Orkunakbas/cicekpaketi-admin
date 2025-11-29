@@ -1,11 +1,28 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import Title from '@/components/design/title/Title';
 import TotalDegerler from './TotalDegerler';
 import BuAykiDegerler from './BuAykiDegerler';
 import EnCokSatanUrunler from './EnCokSatanUrunler';
 import EnSonUyeList from './EnSonUyeList';
+import { 
+  fetchMonthlyStats, 
+  fetchTotalStats, 
+  fetchTopProducts, 
+  fetchRecentUsers 
+} from '@/store/slices/dashboardSlice';
 
 const DashboardPage = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Tüm dashboard verilerini çek
+    dispatch(fetchMonthlyStats());
+    dispatch(fetchTotalStats());
+    dispatch(fetchTopProducts());
+    dispatch(fetchRecentUsers());
+  }, [dispatch]);
+
   return (
     <div className="px-6 pb-10">
 

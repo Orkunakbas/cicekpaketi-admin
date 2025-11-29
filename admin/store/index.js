@@ -8,6 +8,7 @@ import siparisSlice from './slices/siparisSlice';
 import userSlice from './slices/userSlice';
 import variantSlice from './slices/variantSlice';
 import productSlice from './slices/productSlice';
+import dashboardSlice from './slices/dashboardSlice';
  
 export const store = configureStore({
   reducer: {
@@ -20,5 +21,6 @@ export const store = configureStore({
     users: userSlice,
     variant: variantSlice,
     products: productSlice,
+    dashboard: dashboardSlice,
   },
 }); 

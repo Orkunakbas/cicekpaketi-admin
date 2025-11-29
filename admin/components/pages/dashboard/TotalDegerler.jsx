@@ -1,70 +1,53 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 
 const TotalDegerler = () => {
-  // Örnek veriler - API'den gelecek
+  const { totalStats, loading } = useSelector((state) => state.dashboard);
+
+  // API'den gelen verileri kullan
   const stats = [
     { 
       title: 'Toplam Sipariş', 
-      value: 1250, 
+      value: totalStats?.totalOrders.value || 0, 
       chartColor: '#3b82f6',
       gradient: 'from-blue-500 to-cyan-500',
-      data: [
-        { value: 1100 },
-        { value: 1150 },
-        { value: 1120 },
-        { value: 1180 },
-        { value: 1200 },
-        { value: 1230 },
-        { value: 1250 }
-      ]
+      data: totalStats?.totalOrders.chartData || []
     },
     { 
       title: 'Toplam Üye', 
-      value: 1234, 
+      value: totalStats?.totalUsers.value || 0, 
       chartColor: '#ec4899',
       gradient: 'from-pink-500 to-rose-500',
-      data: [
-        { value: 1100 },
-        { value: 1140 },
-        { value: 1170 },
-        { value: 1190 },
-        { value: 1210 },
-        { value: 1220 },
-        { value: 1234 }
-      ]
+      data: totalStats?.totalUsers.chartData || []
     },
     { 
       title: 'Toplam Ürün', 
-      value: 156, 
+      value: totalStats?.totalProducts.value || 0, 
       chartColor: '#a855f7',
       gradient: 'from-purple-500 to-pink-500',
-      data: [
-        { value: 120 },
-        { value: 130 },
-        { value: 135 },
-        { value: 145 },
-        { value: 148 },
-        { value: 152 },
-        { value: 156 }
-      ]
+      data: totalStats?.totalProducts.chartData || []
     },
     { 
       title: 'Toplam Değerlendirme', 
-      value: 342, 
+      value: 0, 
       chartColor: '#eab308',
       gradient: 'from-yellow-500 to-amber-500',
       data: [
-        { value: 280 },
-        { value: 295 },
-        { value: 310 },
-        { value: 320 },
-        { value: 330 },
-        { value: 338 },
-        { value: 342 }
+        { value: 0 },
+        { value: 0 },
+        { value: 0 },
+        { value: 0 },
+        { value: 0 },
+        { value: 0 },
+        { value: 0 }
       ]
     },
   ];
+
+  if (loading.totalStats) {
+    return <div className="text-white">Yükleniyor...</div>;
+  }
 
   return (
     <div className="space-y-3">

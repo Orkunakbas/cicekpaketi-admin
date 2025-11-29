@@ -1,14 +1,25 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { FaMoneyBillWave, FaChartLine, FaShoppingBag, FaUserPlus, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 
 const BuAykiDegerler = () => {
-  // Örnek veriler - API'den gelecek
+  const { monthlyStats, loading } = useSelector((state) => state.dashboard);
+
+  // Format number as K (thousands)
+  const formatNumber = (num) => {
+    if (num >= 1000) {
+      return `₺${(num / 1000).toFixed(1)}K`;
+    }
+    return `₺${parseFloat(num).toFixed(2)}`;
+  };
+
+  // API'den gelen verileri kullan
   const stats = {
     primary: { 
       title: 'Bu Ay Hasılat', 
-      value: '₺45.2K', 
-      trend: '+23.1%',
-      trendUp: true,
+      value: monthlyStats ? formatNumber(monthlyStats.revenue.value) : '₺0', 
+      trend: monthlyStats?.revenue.trend.value || '+0%',
+      trendUp: monthlyStats?.revenue.trend.isUp || true,
       icon: FaMoneyBillWave, 
       iconColor: 'text-emerald-400',
       iconBg: 'bg-green-500/10',
@@ -19,9 +30,9 @@ const BuAykiDegerler = () => {
     secondary: [
       { 
         title: 'Bu Ay Sipariş', 
-        value: 250, 
-        trend: '+12.5%',
-        trendUp: true,
+        value: monthlyStats?.orders.value || 0, 
+        trend: monthlyStats?.orders.trend.value || '+0%',
+        trendUp: monthlyStats?.orders.trend.isUp || true,
         icon: FaShoppingBag, 
         iconColor: 'text-indigo-400',
         iconBg: 'bg-indigo-600/10',
@@ -30,9 +41,9 @@ const BuAykiDegerler = () => {
       },
       { 
         title: 'Ort. Sipariş Tutarı', 
-        value: '₺180.8', 
-        trend: '+9.3%',
-        trendUp: true,
+        value: monthlyStats ? `₺${monthlyStats.avgOrderAmount.value}` : '₺0', 
+        trend: monthlyStats?.avgOrderAmount.trend.value || '+0%',
+        trendUp: monthlyStats?.avgOrderAmount.trend.isUp || true,
         icon: FaChartLine, 
         iconColor: 'text-purple-400',
         iconBg: 'bg-purple-500/10',
@@ -41,9 +52,9 @@ const BuAykiDegerler = () => {
       },
       { 
         title: 'Yeni Üyeler', 
-        value: 89, 
-        trend: '+15.7%',
-        trendUp: true,
+        value: monthlyStats?.newUsers.value || 0, 
+        trend: monthlyStats?.newUsers.trend.value || '+0%',
+        trendUp: monthlyStats?.newUsers.trend.isUp || true,
         icon: FaUserPlus, 
         iconColor: 'text-gray-500',
         iconBg: 'bg-gray-600/10',
@@ -52,6 +63,10 @@ const BuAykiDegerler = () => {
       },
     ]
   };
+
+  if (loading.monthlyStats) {
+    return <div className="text-white">Yükleniyor...</div>;
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

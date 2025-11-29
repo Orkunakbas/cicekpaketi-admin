@@ -1,16 +1,14 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { FaTrophy, FaShoppingBag } from 'react-icons/fa';
 import Image from 'next/image';
 
 const EnCokSatanUrunler = () => {
-  // Örnek veriler - API'den gelecek
-  const topProducts = [
-    { name: 'Kırmızı Gül Buketi', sales: 45, revenue: 8100, image: 'https://cicekpaketi.svision.ch/uploads/products/gul-buket-50-1764231250611-586272551.png' },
-    { name: 'Papatya Sepeti', sales: 38, revenue: 6460, image: 'https://cicekpaketi.svision.ch/uploads/products/gul-buket-50-1764231250611-586272551.png' },
-    { name: 'Orkide', sales: 32, revenue: 9600, image: 'https://cicekpaketi.svision.ch/uploads/products/gul-buket-50-1764231250611-586272551.png' },
-    { name: 'Beyaz Lilyum', sales: 28, revenue: 5320, image: 'https://cicekpaketi.svision.ch/uploads/products/gul-buket-50-1764231250611-586272551.png' },
-    { name: 'Karışık Buket', sales: 25, revenue: 4500, image: 'https://cicekpaketi.svision.ch/uploads/products/gul-buket-50-1764231250611-586272551.png' },
-  ];
+  const { topProducts, loading } = useSelector((state) => state.dashboard);
+
+  if (loading.topProducts) {
+    return <div className="text-white">Yükleniyor...</div>;
+  }
 
   return (
     <div className="border border-gray-700/40 rounded-2xl p-6 hover:border-gray-600/50 transition-all duration-300" style={{ backgroundColor: '#1d1d2b' }}>

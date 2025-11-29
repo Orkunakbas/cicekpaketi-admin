@@ -1,15 +1,13 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { FaUserPlus } from 'react-icons/fa';
 
 const EnSonUyeList = () => {
-  // Örnek veriler - API'den gelecek
-  const recentUsers = [
-    { name: 'Ahmet Yılmaz', email: 'ahmet@example.com', date: '5 dakika önce', avatar: null },
-    { name: 'Ayşe Kaya', email: 'ayse@example.com', date: '1 saat önce', avatar: null },
-    { name: 'Mehmet Demir', email: 'mehmet@example.com', date: '3 saat önce', avatar: null },
-    { name: 'Fatma Şahin', email: 'fatma@example.com', date: '5 saat önce', avatar: null },
-    { name: 'Ali Özkan', email: 'ali@example.com', date: 'Bugün', avatar: null },
-  ];
+  const { recentUsers, loading } = useSelector((state) => state.dashboard);
+
+  if (loading.recentUsers) {
+    return <div className="text-white">Yükleniyor...</div>;
+  }
 
   const getInitials = (name) => {
     return name
