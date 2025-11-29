@@ -24,7 +24,7 @@ const EnCokSatanUrunler = () => {
 
       {/* Products List */}
       <div className="divide-y divide-white/[0.03]">
-        {topProducts.map((product, index) => (
+        {topProducts && topProducts.length > 0 ? topProducts.map((product, index) => (
           <div
             key={index}
             className="group/item flex items-center justify-between py-3.5 first:pt-0 hover:bg-gray-800/20 px-2 -mx-2 rounded-lg transition-all duration-300"
@@ -67,7 +67,11 @@ const EnCokSatanUrunler = () => {
               </div>
             </div>
           </div>
-        ))}
+        )) : (
+          <div className="py-8 text-center">
+            <p className="text-gray-500 text-sm">Henüz satış verisi yok</p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const dashboardController = require('../controllers/dashboardController');
-const { authenticateToken, authorizeRole } = require('../middleware/authMiddleware');
+const authMiddleware = require('../middleware/authMiddleware');
 
-// Tüm dashboard endpointleri admin yetkisi gerektirir
-router.use(authenticateToken, authorizeRole(['admin']));
+// Tüm dashboard endpointleri token gerektirir
+router.use(authMiddleware);
 
 // Bu Ay İstatistikleri
 router.get('/monthly-stats', dashboardController.getMonthlyStats);
